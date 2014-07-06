@@ -1,9 +1,13 @@
+/**
+ * com.nutanix.prism;
+ */
 package com.nutanix.prism;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
@@ -18,16 +22,21 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class Functions {
+/**
+ * 
+ * @author andreleibovici
+ * @version 1.0
+ */
+public class Functions implements Cloneable {
 	/**
 	 * Encode String to Base64
 	 * 
 	 * @param string
-	 * @return
-	 */
-	protected static final String EncodeBase64(String string) {
+	
+	 * @return String */
+	protected static final String encodeBase64(String string) {
 
-		byte[] encodedBytes = Base64.encodeBase64(string.getBytes());
+		final byte[] encodedBytes = Base64.encodeBase64(string.getBytes());
 
 		return new String(encodedBytes);
 	}
@@ -36,53 +45,56 @@ public class Functions {
 	 * String To JSON
 	 * 
 	 * @param string
-	 * @return
-	 */
-	protected final static JSONObject StringToJSON(String string) {
+	
+	 * @return JSONObject */
+	protected static final Map<?, ?> stringToJSON(String string) {
 
-		JSONParser parser = new JSONParser();
+		final JSONParser parser = new JSONParser();
 		Object obj = null;
 
 		try {
 			obj = parser.parse(string);
-		} catch (org.json.simple.parser.ParseException e) {
-			e.printStackTrace();
+		} catch (final org.json.simple.parser.ParseException e) {
+			return null;
 		}
 
 		return (JSONObject) obj;
 	}
 
 	/**
-	 * Execute Http Call
+	 * Execute HTTP Call
 	 * 
-	 * @param URI
-	 * @return
-	 */
-	protected static final String HttpClientExecute(final String URI,
-			final String Header) {
+	 * @param uri
+	 * @param authHeader
+	 *            String
+	
+	 * @return String */
+	protected static final String httpClientExecute(final String uri,
+			final String authHeader) {
 
-		HttpGet HttpRequest = new HttpGet(URI);
-		HttpRequest.addHeader("Authorization", Header);
+		final HttpGet httpRequest = new HttpGet(uri);
 		CloseableHttpResponse response = null;
 
+		httpRequest.addHeader("Authorization", authHeader);
+
 		try {
-			response = com.nutanix.prism.Connection.httpclient
-					.execute(HttpRequest);
-		} catch (ClientProtocolException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
+			response = com.nutanix.prism.Connection.HttpClient
+					.execute(httpRequest);
+		} catch (final ClientProtocolException e1) {
+			return null;
+		} catch (final IOException e1) {
+			return null;
 		}
 
-		HttpEntity e = response.getEntity();
+		final HttpEntity e = response.getEntity();
 		String entity = null;
 
 		try {
 			entity = EntityUtils.toString(e);
-		} catch (ParseException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		} catch (final ParseException e1) {
+			return null;
+		} catch (final IOException e1) {
+			return null;
 		}
 
 		return entity;
@@ -91,31 +103,40 @@ public class Functions {
 	/**
 	 * Ignore SelfSigned Certificate
 	 * 
-	 * @return
-	 */
+	
+	 * @return SSLConnectionSocketFactory */
 	protected static final SSLConnectionSocketFactory verifyHostname() {
 
-		SSLContextBuilder builder = new SSLContextBuilder();
+		final SSLContextBuilder builder = new SSLContextBuilder();
+		SSLConnectionSocketFactory sslsf = null;
 
 		try {
 			builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (KeyStoreException e) {
-			e.printStackTrace();
+		} catch (final NoSuchAlgorithmException e) {
+			return null;
+		} catch (final KeyStoreException e) {
+			return null;
 		}
-
-		SSLConnectionSocketFactory sslsf = null;
 
 		try {
 			sslsf = new SSLConnectionSocketFactory(builder.build(),
 					SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-		} catch (KeyManagementException e) {
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+		} catch (final KeyManagementException e) {
+			return null;
+		} catch (final NoSuchAlgorithmException e) {
+			return null;
 		}
 
 		return sslsf;
+	}
+
+	/**
+	 * Method clone.
+	 * @return Functions
+	 * @throws CloneNotSupportedException
+	 */
+	@Override
+	public Functions clone() throws CloneNotSupportedException {
+		return (Functions) super.clone();
 	}
 }

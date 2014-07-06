@@ -1,21 +1,40 @@
+/**
+ * com.nutanix.prism;
+ */
 package com.nutanix.prism;
 
-import org.json.simple.JSONObject;
+import java.text.MessageFormat;
+import java.util.Map;
 
-public class Hosts {
+/**
+ * @author andreleibovici
+ * @version $Revision: 1.0 $
+ */
+public class Hosts implements Cloneable {
 	/**
-	 * GetHosts()
+	 * getHosts()
 	 * 
-	 * @return
-	 */
-	public JSONObject GetHosts() {
+	
+	 * @return JSONObject */
+	public Map<?, ?> getHosts() {
 
-		String URI = "https://" + com.nutanix.prism.Connection.SERVICE_ADDRESS
-				+ ":" + com.nutanix.prism.Connection.SERVICE_PORT
-				+ com.nutanix.prism.Connection.SERVICE_HOST_GET;
+		final String uri = MessageFormat.format("https://{0}:{1}{2}",
+				com.nutanix.prism.Connection.SERVICE_ADDRESS,
+				com.nutanix.prism.Connection.SERVICE_PORT,
+				com.nutanix.prism.Connection.SERVICE_HOST_GET);
 
 		return com.nutanix.prism.Functions
-				.StringToJSON(com.nutanix.prism.Functions.HttpClientExecute(
-						URI, null));
+				.stringToJSON(com.nutanix.prism.Functions.httpClientExecute(
+						uri, null));
+	}
+
+	/**
+	 * Method clone.
+	 * @return Hosts
+	 * @throws CloneNotSupportedException
+	 */
+	@Override
+	public Hosts clone() throws CloneNotSupportedException {
+		return (Hosts) super.clone();
 	}
 }
